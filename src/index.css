@@ -1,0 +1,236 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #2d6a4f;
+  --green-light: #40916c;
+  --green-bg: #f0faf4;
+  --red: #c62828;
+  --bg: #f5f7f5;
+  --surface: #ffffff;
+  --border: #d8e4db;
+  --text: #1a2e20;
+  --muted: #5f7a66;
+  --radius: 10px;
+  --shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.page { max-width: 680px; margin: 0 auto; padding: 0 16px 48px; }
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 0 16px;
+  flex-wrap: wrap;
+}
+
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-main { display: flex; flex-direction: column; gap: 16px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.back-link {
+  display: inline-block;
+  color: var(--green-light);
+  text-decoration: none;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.back-link:hover { text-decoration: underline; }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.card-header h2 { margin-bottom: 0; }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-primary, .btn-secondary, .btn-google, .btn-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 18px;
+  transition: opacity .15s;
+}
+
+.btn-primary { background: var(--green); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--green-light); }
+.btn-primary:disabled { opacity: .5; cursor: default; }
+
+.btn-secondary { background: var(--green-bg); color: var(--green); border: 1px solid var(--border); }
+.btn-secondary:hover { background: #ddf0e5; }
+
+.btn-google { width: 100%; background: #fff; color: var(--text); border: 1px solid var(--border); margin-top: 8px; }
+.btn-google:hover { background: var(--bg); }
+
+.btn-sm { font-size: 12px; padding: 6px 12px; border-radius: 6px; }
+.btn-danger { background: #fef2f2; color: var(--red); border: 1px solid #fca5a5; }
+.btn-danger:hover { background: #fee2e2; }
+
+.btn-choice { background: var(--bg); color: var(--text); border: 2px solid var(--border); flex: 1; }
+.btn-choice.selected, .btn-choice:hover { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+
+.btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-group.vertical { flex-direction: column; }
+.mt { margin-top: 16px; }
+
+/* ── Auth ────────────────────────────────────────────────── */
+.auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; width: 100%; max-width: 400px; box-shadow: var(--shadow); }
+.auth-title { font-size: 20px; margin-bottom: 8px; }
+.auth-card h2 { font-size: 18px; margin-bottom: 20px; color: var(--muted); font-weight: 400; }
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-form label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; }
+.auth-switch { margin-top: 16px; font-size: 13px; color: var(--muted); text-align: center; }
+.auth-switch a { color: var(--green-light); }
+
+/* ── Forms ───────────────────────────────────────────────── */
+input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+input:focus { border-color: var(--green-light); }
+label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-weight: 500; }
+.inline-form { display: flex; gap: 10px; }
+.inline-form input { flex: 1; }
+.error { color: var(--red); font-size: 13px; margin-bottom: 8px; }
+
+/* ── Event creation form ─────────────────────────────────── */
+.event-form { display: flex; flex-direction: column; gap: 16px; }
+.form-group { border: none; padding: 0; margin: 0; }
+.form-group legend { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.type-options { display: flex; gap: 10px; }
+.btn-choice.disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-choice.disabled:hover { border-color: var(--border); background: var(--bg); color: var(--text); }
+.coming-soon { font-size: 10px; font-weight: 600; background: var(--muted); color: var(--surface); border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
+.form-row { display: flex; gap: 14px; }
+.form-row label { flex: 1; }
+
+/* ── Event list ──────────────────────────────────────────── */
+.event-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.event-link { display: flex; justify-content: space-between; padding: 10px 8px; border-radius: 7px; text-decoration: none; color: var(--text); transition: background .12s; }
+.event-link:hover { background: var(--green-bg); }
+.event-name { font-weight: 500; }
+.event-date { color: var(--muted); font-size: 13px; }
+
+/* ── Table list (EventPage) ──────────────────────────────── */
+.table-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.table-link { display: flex; justify-content: space-between; align-items: center; padding: 12px 8px; border-radius: 7px; text-decoration: none; color: var(--text); transition: background .12s; }
+.table-link:hover { background: var(--green-bg); }
+.table-link-left { display: flex; flex-direction: column; gap: 2px; }
+.table-num { font-weight: 600; font-size: 14px; }
+.table-players { font-size: 13px; color: var(--muted); }
+.table-arrow { font-size: 20px; color: var(--muted); }
+
+/* ── Round score grid (TablePage) ────────────────────────── */
+.round-grid-wrap { overflow-x: auto; }
+.round-grid { width: 100%; border-collapse: collapse; font-size: 13px; }
+.round-grid th, .round-grid td { padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.round-grid th { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; text-align: center; }
+.round-grid .rg-player { text-align: left; font-weight: 600; min-width: 90px; }
+.round-grid th.rg-player { text-align: left; }
+.round-grid .rg-game { text-align: center; min-width: 52px; }
+.round-grid .rg-tag { font-size: 10px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 72px; }
+.round-grid .rg-score { text-align: center; font-weight: 600; }
+.round-grid .rg-total { text-align: center; font-weight: 700; background: var(--bg); }
+.round-grid tbody tr:last-child td { border-bottom: none; }
+
+/* ── Round sections (TablePage / GuestView) ──────────────── */
+.badge-open { background: #fff8e1; color: #b45309; }
+.guest-round { margin-top: 16px; }
+.guest-round-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+
+/* ── Share / edit link rows ──────────────────────────────── */
+.share-card { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.link-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.link-label { font-size: 12px; font-weight: 600; color: var(--muted); min-width: 90px; }
+.share-link { font-size: 12px; color: var(--muted); background: var(--bg); padding: 4px 8px; border-radius: 5px; flex: 1; word-break: break-all; }
+
+/* ── Score table ─────────────────────────────────────────── */
+.score-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.score-table th { text-align: left; color: var(--muted); font-size: 12px; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.score-table td { padding: 9px 8px; border-bottom: 1px solid var(--border); }
+.score-table tr.leader td { font-weight: 600; }
+.score-table .num { text-align: right; }
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+
+/* ── Game log ────────────────────────────────────────────── */
+.section-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 10px; }
+.game-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.game-item { border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+.game-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.game-num { font-weight: 600; font-size: 14px; }
+.game-scores { display: flex; flex-wrap: wrap; gap: 6px; }
+.game-score-chip { font-size: 13px; background: var(--bg); padding: 3px 8px; border-radius: 99px; }
+.game-hand { font-size: 12px; color: var(--green); margin-left: 4px; }
+
+/* ── Manual score entry ──────────────────────────────────── */
+.manual-scores { display: flex; flex-direction: column; gap: 12px; }
+
+/* ── Wizard ──────────────────────────────────────────────── */
+.wizard-card { max-width: 520px; }
+.wizard-step { display: flex; flex-direction: column; gap: 16px; }
+.wizard-back { background: none; border: none; color: var(--green-light); font-size: 13px; cursor: pointer; text-align: left; padding: 0; }
+.step-title { font-size: 18px; font-weight: 600; }
+.step-hint { font-size: 13px; color: var(--muted); }
+.score-preview { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: var(--bg); border-radius: 7px; }
+.score-player { font-weight: 500; }
+.score-value { font-size: 16px; font-weight: 700; }
+.confirm-note { font-size: 14px; color: var(--muted); }
+
+/* ── Chips / badges ──────────────────────────────────────── */
+.players-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { background: var(--green-bg); color: var(--green); border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+.badge { font-size: 11px; font-weight: 600; background: var(--green-bg); color: var(--green); padding: 3px 8px; border-radius: 99px; }
+
+/* ── History ─────────────────────────────────────────────── */
+.stats-row { display: flex; gap: 24px; }
+.stat { display: flex; flex-direction: column; }
+.stat-value { font-size: 28px; font-weight: 700; }
+.stat-label { font-size: 12px; color: var(--muted); }
+.top-hands { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.top-hands li { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.history-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.history-hand { font-weight: 500; }
+
+/* ── Modal ───────────────────────────────────────────────── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+.modal { background: var(--surface); border-radius: var(--radius); padding: 28px; width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 32px rgba(0,0,0,.18); }
+.modal h2 { font-size: 17px; }
+
+/* ── Misc ────────────────────────────────────────────────── */
+.loading { padding: 48px; text-align: center; color: var(--muted); }
+.muted { color: var(--muted); font-size: 13px; }
+.small { font-size: 12px; }
+.user-name { font-size: 13px; color: var(--muted); }
