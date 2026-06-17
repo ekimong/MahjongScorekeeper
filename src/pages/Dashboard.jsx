@@ -34,10 +34,15 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
-    getUserEvents(user.uid).then((evts) => {
-      setEvents(evts);
-      setLoading(false);
-    });
+    getUserEvents(user.uid)
+      .then((evts) => {
+        setEvents(evts);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('getUserEvents error:', err);
+        setLoading(false);
+      });
   }, [user.uid]);
 
   // Auto-update name whenever type/date/time change, unless user has manually edited it
