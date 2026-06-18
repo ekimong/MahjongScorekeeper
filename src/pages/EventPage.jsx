@@ -29,24 +29,33 @@ export default function EventPage() {
   }, [eventId]);
 
   async function load() {
-    // Kick off all three fetches simultaneously
-    const [evtResult, tbls, allGames] = await Promise.all([
-      getEvent(eventId),
-      getTables(eventId),
-      getEventGames(eventId),
-    ]);
+    try {
+      const [evtResult, tbls] = await Promise.all([
+        getEvent(eventId),
+        getTables(eventId),
+      ]);
 
-    let evt = evtResult;
-    if (evt && !evt.editToken) {
-      const token = await ensureEditToken(eventId);
-      evt = { ...evt, editToken: token };
+      let evt = evtResult;
+      if (evt && !evt.editToken) {
+        const token = await ensureEditToken(eventId);
+        evt = { ...evt, editToken: token };
+      }
+      setEvent(evt);
+      setTables(tbls);
+      setLoading(false);
+
+      // Fetch games separately so a missing index doesn't block the page
+      try {
+        const allGames = await getEventGames(eventId);
+        computeTotals(tbls, allGames);
+      } catch (err) {
+        console.error('getEventGames error (index may be missing):', err);
+        setTotalsLoading(false);
+      }
+    } catch (err) {
+      console.error('EventPage load error:', err);
+      setLoading(false);
     }
-    setEvent(evt);
-    setTables(tbls);
-    setLoading(false);
-
-    // Compute totals from already-fetched games — no extra round trips
-    computeTotals(tbls, allGames);
   }
 
   function computeTotals(tbls, allGames) {
