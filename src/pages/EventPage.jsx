@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEvent, getTables, getEventGames, createTable, ensureEditToken } from '../lib/firestore';
+import { getEvent, getTables, getEventGames, createTable, ensureEditToken, getRounds, completeRound, createRound } from '../lib/firestore';
 import { useEdit } from '../context/EditContext';
 import TableSetupModal from '../components/GameSetupModal';
 
@@ -16,6 +16,7 @@ export default function EventPage() {
   const [loading, setLoading] = useState(true);
   const [totalsLoading, setTotalsLoading] = useState(true);
   const [showSetup, setShowSetup] = useState(false);
+  const [duplicateTableId, setDuplicateTableId] = useState(null);
 
   const isOrganizer = user && event && event.createdBy === user.uid;
   const canScore = !!user || canEdit(eventId);
@@ -87,11 +88,22 @@ export default function EventPage() {
       return existing === newNames;
     });
     if (duplicate) {
-      throw new Error('A table with these players already exists.');
+      setDuplicateTableId(duplicate.id);
+      throw new Error('A table with these players already exists. Would you like to start a new round for that table instead?');
     }
     const { tableId } = await createTable(eventId, players);
     setShowSetup(false);
     navigate(`/event/${eventId}/table/${tableId}`);
+  }
+
+  async function handleStartNewRoundForDuplicate() {
+    const rounds = await getRounds(eventId, duplicateTableId);
+    const openRound = rounds.find((r) => r.status === 'open');
+    if (openRound) await completeRound(eventId, duplicateTableId, openRound.id);
+    const roundId = await createRound(eventId, duplicateTableId);
+    setShowSetup(false);
+    setDuplicateTableId(null);
+    navigate(`/event/${eventId}/table/${duplicateTableId}/round/${roundId}/score`);
   }
 
   if (loading) return <div className="loading">Loading…</div>;
@@ -185,7 +197,8 @@ export default function EventPage() {
       {showSetup && (
         <TableSetupModal
           onConfirm={handleTableCreated}
-          onClose={() => setShowSetup(false)}
+          onClose={() => { setShowSetup(false); setDuplicateTableId(null); }}
+          onStartNewRound={duplicateTableId ? handleStartNewRoundForDuplicate : null}
           currentUser={user}
         />
       )}

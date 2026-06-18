@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function TableSetupModal({ onConfirm, onClose, currentUser }) {
+export default function TableSetupModal({ onConfirm, onClose, onStartNewRound, currentUser }) {
   const [players, setPlayers] = useState([
     { name: currentUser?.displayName || '', uid: currentUser?.uid || null },
     { name: '', uid: null },
@@ -44,12 +44,28 @@ export default function TableSetupModal({ onConfirm, onClose, currentUser }) {
               />
             </label>
           ))}
-          {error && <p className="error">{error}</p>}
+          {error && (
+            <div>
+              <p className="error">{error}</p>
+              {onStartNewRound && (
+                <button
+                  type="button"
+                  className="btn-primary mt"
+                  onClick={onStartNewRound}
+                  disabled={saving}
+                >
+                  Yes, start a new round
+                </button>
+              )}
+            </div>
+          )}
           <div className="btn-group mt">
             <button type="button" className="btn-secondary" onClick={onClose} disabled={saving}>Cancel</button>
-            <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? 'Creating…' : 'Start table'}
-            </button>
+            {!onStartNewRound && (
+              <button type="submit" className="btn-primary" disabled={saving}>
+                {saving ? 'Creating…' : 'Start table'}
+              </button>
+            )}
           </div>
         </form>
       </div>
