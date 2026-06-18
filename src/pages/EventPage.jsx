@@ -82,6 +82,14 @@ export default function EventPage() {
   }
 
   async function handleTableCreated(players) {
+    const newNames = players.map((p) => p.name).filter(Boolean).map((n) => n.toLowerCase()).sort().join(',');
+    const duplicate = tables.find((t) => {
+      const existing = (t.players || []).map((p) => p.name).filter(Boolean).map((n) => n.toLowerCase()).sort().join(',');
+      return existing === newNames;
+    });
+    if (duplicate) {
+      throw new Error('A table with these players already exists.');
+    }
     const { tableId } = await createTable(eventId, players);
     setShowSetup(false);
     navigate(`/event/${eventId}/table/${tableId}`);

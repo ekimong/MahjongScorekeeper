@@ -12,11 +12,20 @@ export default function TableSetupModal({ onConfirm, onClose, currentUser }) {
     setPlayers((prev) => prev.map((p, idx) => idx === i ? { ...p, name: val } : p));
   }
 
-  function handleSubmit(e) {
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    // At least one named player required
     if (!players.some((p) => p.name.trim())) return;
-    onConfirm(players.map((p) => ({ name: p.name.trim(), uid: p.uid || null })));
+    setSaving(true);
+    setError('');
+    try {
+      await onConfirm(players.map((p) => ({ name: p.name.trim(), uid: p.uid || null })));
+    } catch (err) {
+      setError(err.message || 'Failed to create table.');
+      setSaving(false);
+    }
   }
 
   return (
@@ -35,9 +44,12 @@ export default function TableSetupModal({ onConfirm, onClose, currentUser }) {
               />
             </label>
           ))}
+          {error && <p className="error">{error}</p>}
           <div className="btn-group mt">
-            <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn-primary">Start table</button>
+            <button type="button" className="btn-secondary" onClick={onClose} disabled={saving}>Cancel</button>
+            <button type="submit" className="btn-primary" disabled={saving}>
+              {saving ? 'Creating…' : 'Start table'}
+            </button>
           </div>
         </form>
       </div>
