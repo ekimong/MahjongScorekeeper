@@ -70,13 +70,16 @@ export async function getUserEvents(uid) {
 
 export async function getEventsAsPlayer(uid) {
   try {
+    console.log('[getEventsAsPlayer] starting...');
     const q = query(collectionGroup(db, 'tables'), where('playerUids', 'array-contains', uid));
     const snap = await getDocs(q);
+    console.log('[getEventsAsPlayer] done, tables found:', snap.size);
     const eventIds = [...new Set(snap.docs.map((d) => d.data().eventId).filter(Boolean))];
     if (eventIds.length === 0) return [];
     const events = await Promise.all(eventIds.map((id) => getEvent(id)));
     return events.filter(Boolean);
-  } catch {
+  } catch (err) {
+    console.error('[getEventsAsPlayer] error:', err.message);
     return [];
   }
 }

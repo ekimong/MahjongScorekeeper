@@ -36,8 +36,10 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
+    console.log('[Dashboard] loading events for uid:', user.uid);
     Promise.all([getUserEvents(user.uid), getEventsAsPlayer(user.uid)])
       .then(([created, playing]) => {
+        console.log('[Dashboard] created:', created.length, 'playing:', playing.length);
         const seen = new Set();
         const merged = [...created, ...playing].filter((e) => {
           if (seen.has(e.id)) return false;
