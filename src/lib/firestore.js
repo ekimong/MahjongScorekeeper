@@ -1,10 +1,10 @@
 import {
   collection,
-  collectionGroup,
   doc,
   addDoc,
   getDoc,
   getDocs,
+  setDoc,
   updateDoc,
   deleteDoc,
   query,
@@ -69,12 +69,10 @@ export async function getUserEvents(uid) {
 }
 
 export async function getEventsAsPlayer(uid) {
-  const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
   try {
-    const q = query(collectionGroup(db, 'tables'), where('playerUids', 'array-contains', uid));
-    const result = await Promise.race([getDocs(q), timeout]);
-    if (!result) return []; // timed out
-    const eventIds = [...new Set(result.docs.map((d) => d.data().eventId).filter(Boolean))];
+    const q = query(collection(db, 'playerMemberships'), where('uid', '==', uid));
+    const snap = await getDocs(q);
+    const eventIds = [...new Set(snap.docs.map((d) => d.data().eventId).filter(Boolean))];
     if (eventIds.length === 0) return [];
     const events = await Promise.all(eventIds.map((id) => getEvent(id)));
     return events.filter(Boolean);
@@ -87,13 +85,18 @@ export async function getEventsAsPlayer(uid) {
 // ── Tables ───────────────────────────────────────────────────────────
 
 export async function createTable(eventId, players) {
-  const playerUids = players.map((p) => p.uid).filter(Boolean);
   const tableRef = await addDoc(collection(db, 'events', eventId, 'tables'), {
     eventId,
     players,
-    playerUids,
     createdAt: serverTimestamp(),
   });
+  // Record membership for each player with an account so they can find this event
+  const playerUids = players.map((p) => p.uid).filter(Boolean);
+  await Promise.all(
+    playerUids.map((uid) =>
+      setDoc(doc(db, 'playerMemberships', `${uid}_${eventId}`), { uid, eventId })
+    )
+  );
   const roundRef = await addDoc(
     collection(db, 'events', eventId, 'tables', tableRef.id, 'rounds'),
     {
