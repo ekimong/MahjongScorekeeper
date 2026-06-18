@@ -24,6 +24,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
 
@@ -42,6 +43,7 @@ export default function Dashboard() {
       })
       .catch((err) => {
         console.error('getUserEvents error:', err);
+        setLoadError(err.message || 'Failed to load events.');
         setLoading(false);
       });
   }, [user.uid]);
@@ -160,6 +162,8 @@ export default function Dashboard() {
           <h2>Your events</h2>
           {loading ? (
             <p className="muted">Loading…</p>
+          ) : loadError ? (
+            <p className="error">{loadError}</p>
           ) : events.length === 0 ? (
             <p className="muted">No events yet. Create one above.</p>
           ) : (

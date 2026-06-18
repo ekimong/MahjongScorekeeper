@@ -58,13 +58,14 @@ export async function getEventByEditToken(token) {
 }
 
 export async function getUserEvents(uid) {
-  const q = query(
-    collection(db, 'events'),
-    where('createdBy', '==', uid),
-    orderBy('createdAt', 'desc')
-  );
+  const q = query(collection(db, 'events'), where('createdBy', '==', uid));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const events = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return events.sort((a, b) => {
+    const aMs = a.createdAt?.toMillis?.() ?? 0;
+    const bMs = b.createdAt?.toMillis?.() ?? 0;
+    return bMs - aMs;
+  });
 }
 
 // ── Tables ───────────────────────────────────────────────────────────
