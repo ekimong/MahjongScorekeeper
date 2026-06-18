@@ -100,10 +100,10 @@ export default function EventPage() {
     const rounds = await getRounds(eventId, duplicateTableId);
     const openRound = rounds.find((r) => r.status === 'open');
     if (openRound) await completeRound(eventId, duplicateTableId, openRound.id);
-    const roundId = await createRound(eventId, duplicateTableId);
+    await createRound(eventId, duplicateTableId);
     setShowSetup(false);
     setDuplicateTableId(null);
-    navigate(`/event/${eventId}/table/${duplicateTableId}/round/${roundId}/score`);
+    navigate(`/event/${eventId}/table/${duplicateTableId}`);
   }
 
   if (loading) return <div className="loading">Loading…</div>;
