@@ -58,14 +58,8 @@ export async function getEventByEditToken(token) {
 }
 
 export async function getUserEvents(uid) {
-  console.log('[getUserEvents] uid =', uid);
-  // Diagnostic: fetch all events to check collection access
-  const allSnap = await getDocs(collection(db, 'events'));
-  console.log('[getUserEvents] total events in collection:', allSnap.size);
-  allSnap.docs.forEach((d) => console.log('  doc id:', d.id, 'createdBy:', d.data().createdBy));
   const q = query(collection(db, 'events'), where('createdBy', '==', uid));
   const snap = await getDocs(q);
-  console.log('[getUserEvents] filtered docs returned:', snap.size);
   const events = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   return events.sort((a, b) => {
     const aMs = a.createdAt?.toMillis?.() ?? 0;
