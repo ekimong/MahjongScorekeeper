@@ -1,5 +1,6 @@
 import {
   collection,
+  collectionGroup,
   doc,
   addDoc,
   getDoc,
@@ -168,6 +169,12 @@ export async function saveGame(eventId, tableId, roundId, gameData) {
   );
   await updateDoc(ref, { gameId: ref.id });
   return ref.id;
+}
+
+export async function getEventGames(eventId) {
+  const q = query(collectionGroup(db, 'games'), where('eventId', '==', eventId));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
 export async function getGames(eventId, tableId, roundId) {

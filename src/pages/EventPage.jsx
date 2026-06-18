@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEvent, getTables, getRounds, getGames, createTable, ensureEditToken } from '../lib/firestore';
+import { getEvent, getTables, getEventGames, createTable, ensureEditToken } from '../lib/firestore';
 import { useEdit } from '../context/EditContext';
 import TableSetupModal from '../components/GameSetupModal';
 
@@ -44,28 +44,27 @@ export default function EventPage() {
 
   async function loadTotals(tbls) {
     setTotalsLoading(true);
+    // Build a tableId → players lookup so we can map scores to names
+    const playersByTable = {};
+    tbls.forEach((t) => { playersByTable[t.id] = t.players || []; });
+
+    // Single collection group query — no nested waterfall
+    const allGames = await getEventGames(eventId);
+
     const scoreMap = {};
-    await Promise.all(
-      tbls.map(async (table) => {
-        const rounds = await getRounds(eventId, table.id);
-        await Promise.all(
-          rounds.map(async (round) => {
-            const games = await getGames(eventId, table.id, round.id);
-            games.forEach((game) => {
-              if (!game.scores) return;
-              table.players?.forEach((player, i) => {
-                if (!player.name?.trim()) return;
-                const key = player.name.trim().toLowerCase();
-                if (!scoreMap[key]) scoreMap[key] = { name: player.name, points: 0, wins: 0, games: 0 };
-                scoreMap[key].points += game.scores[i] || 0;
-                scoreMap[key].games += 1;
-                if (!game.isWallGame && game.winnerId === i) scoreMap[key].wins += 1;
-              });
-            });
-          })
-        );
-      })
-    );
+    allGames.forEach((game) => {
+      if (!game.scores) return;
+      const players = playersByTable[game.tableId] || [];
+      players.forEach((player, i) => {
+        if (!player.name?.trim()) return;
+        const key = player.name.trim().toLowerCase();
+        if (!scoreMap[key]) scoreMap[key] = { name: player.name, points: 0, wins: 0, games: 0 };
+        scoreMap[key].points += game.scores[i] || 0;
+        scoreMap[key].games += 1;
+        if (!game.isWallGame && game.winnerId === i) scoreMap[key].wins += 1;
+      });
+    });
+
     const sorted = Object.values(scoreMap).sort((a, b) => b.points - a.points);
     setTotals(sorted);
     setTotalsLoading(false);
