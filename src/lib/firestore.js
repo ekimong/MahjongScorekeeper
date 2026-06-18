@@ -187,9 +187,16 @@ export async function saveGame(eventId, tableId, roundId, gameData) {
 }
 
 export async function getEventGames(eventId) {
-  const q = query(collectionGroup(db, 'games'), where('eventId', '==', eventId));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const tables = await getTables(eventId);
+  const allGames = [];
+  await Promise.all(tables.map(async (table) => {
+    const rounds = await getRounds(eventId, table.id);
+    await Promise.all(rounds.map(async (round) => {
+      const games = await getGames(eventId, table.id, round.id);
+      allGames.push(...games.map((g) => ({ ...g, tableId: table.id })));
+    }));
+  }));
+  return allGames;
 }
 
 export async function getGames(eventId, tableId, roundId) {
