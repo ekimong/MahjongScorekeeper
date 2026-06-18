@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -8,6 +10,8 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [resetSent, setResetSent] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -18,6 +22,23 @@ export default function Login() {
     } catch (err) {
       console.error('login error:', err);
       setError(err.message || 'Sign-in failed.');
+    }
+  }
+
+  async function handleResetPassword() {
+    if (!email) {
+      setError('Enter your email above first, then click Forgot password.');
+      return;
+    }
+    setResetting(true);
+    setError('');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetSent(true);
+    } catch (err) {
+      setError(err.message || 'Failed to send reset email.');
+    } finally {
+      setResetting(false);
     }
   }
 
@@ -48,6 +69,12 @@ export default function Login() {
           </label>
           <button type="submit" className="btn-primary">Sign in</button>
         </form>
+        {resetSent
+          ? <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>Password reset email sent to <strong>{email}</strong>.</p>
+          : <button type="button" className="link-btn" onClick={handleResetPassword} disabled={resetting}>
+              {resetting ? 'Sending…' : 'Forgot password?'}
+            </button>
+        }
         <button onClick={handleGoogle} className="btn-google">Sign in with Google</button>
         <p className="auth-switch">
           Don't have an account? <Link to="/register">Register</Link>
