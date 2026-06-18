@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUserEvents, getEventsAsPlayer, createEvent } from '../lib/firestore';
+import { getUserEvents, createEvent } from '../lib/firestore';
 
 const EVENT_TYPES = [
   { value: 'open_play', label: 'Open Play', enabled: true },
@@ -36,27 +36,9 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
-    // Load created events first so the page isn't blocked by the player query
-    getUserEvents(user.uid)
-      .then((created) => {
-        setEvents(created);
-        setLoading(false);
-        // Then merge in events where user is a player (best-effort)
-        return getEventsAsPlayer(user.uid);
-      })
-      .then((playing) => {
-        setEvents((prev) => {
-          const seen = new Set(prev.map((e) => e.id));
-          const extra = playing.filter((e) => !seen.has(e.id));
-          if (extra.length === 0) return prev;
-          return [...prev, ...extra].sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
-        });
-      })
-      .catch((err) => {
-        console.error('load events error:', err);
-        setLoadError(err.message || 'Failed to load events.');
-        setLoading(false);
-      });
+    getUserEvents()
+      .then((evts) => { setEvents(evts); setLoading(false); })
+      .catch((err) => { setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
   }, [user.uid]);
 
   // Auto-update name whenever type/date/time change, unless user has manually edited it

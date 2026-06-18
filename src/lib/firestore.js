@@ -57,9 +57,8 @@ export async function getEventByEditToken(token) {
   return { id: d.id, ...d.data() };
 }
 
-export async function getUserEvents(uid) {
-  const q = query(collection(db, 'events'), where('createdBy', '==', uid));
-  const snap = await getDocs(q);
+export async function getUserEvents() {
+  const snap = await getDocs(collection(db, 'events'));
   const events = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   return events.sort((a, b) => {
     const aMs = a.createdAt?.toMillis?.() ?? 0;
