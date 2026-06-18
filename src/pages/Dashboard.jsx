@@ -36,18 +36,9 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
-    console.log('[Dashboard] fetching events...');
-    // Direct doc fetch to test Firestore connectivity
-    import('../lib/firebase').then(({ db }) => {
-      import('firebase/firestore').then(({ getDoc, doc }) => {
-        getDoc(doc(db, 'events', 'o4gczGAaB1kaeKBGDPkc')).then((snap) => {
-          console.log('[Dashboard] direct doc fetch exists:', snap.exists(), snap.data()?.name);
-        }).catch((err) => console.error('[Dashboard] direct doc error:', err));
-      });
-    });
     getUserEvents()
-      .then((evts) => { console.log('[Dashboard] got', evts.length, 'events'); setEvents(evts); setLoading(false); })
-      .catch((err) => { console.error('[Dashboard] error:', err); setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
+      .then((evts) => { setEvents(evts); setLoading(false); })
+      .catch((err) => { setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
   }, [user.uid]);
 
   // Auto-update name whenever type/date/time change, unless user has manually edited it
