@@ -36,9 +36,10 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
+    console.log('[Dashboard] fetching events...');
     getUserEvents()
-      .then((evts) => { setEvents(evts); setLoading(false); })
-      .catch((err) => { setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
+      .then((evts) => { console.log('[Dashboard] got', evts.length, 'events'); setEvents(evts); setLoading(false); })
+      .catch((err) => { console.error('[Dashboard] error:', err); setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
   }, [user.uid]);
 
   // Auto-update name whenever type/date/time change, unless user has manually edited it
