@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUserEvents, createEvent } from '../lib/firestore';
+import { getUserEvents, getEventsAsPlayer, createEvent } from '../lib/firestore';
 
 const EVENT_TYPES = [
   { value: 'open_play', label: 'Open Play', enabled: true },
@@ -36,13 +36,20 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
-    getUserEvents(user.uid)
-      .then((evts) => {
-        setEvents(evts);
+    Promise.all([getUserEvents(user.uid), getEventsAsPlayer(user.uid)])
+      .then(([created, playing]) => {
+        const seen = new Set();
+        const merged = [...created, ...playing].filter((e) => {
+          if (seen.has(e.id)) return false;
+          seen.add(e.id);
+          return true;
+        });
+        merged.sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
+        setEvents(merged);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('getUserEvents error:', err);
+        console.error('load events error:', err);
         setLoadError(err.message || 'Failed to load events.');
         setLoading(false);
       });

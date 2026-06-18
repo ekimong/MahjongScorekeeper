@@ -68,13 +68,27 @@ export async function getUserEvents(uid) {
   });
 }
 
+export async function getEventsAsPlayer(uid) {
+  try {
+    const q = query(collectionGroup(db, 'tables'), where('playerUids', 'array-contains', uid));
+    const snap = await getDocs(q);
+    const eventIds = [...new Set(snap.docs.map((d) => d.data().eventId).filter(Boolean))];
+    if (eventIds.length === 0) return [];
+    const events = await Promise.all(eventIds.map((id) => getEvent(id)));
+    return events.filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 // ── Tables ───────────────────────────────────────────────────────────
 
 export async function createTable(eventId, players) {
-  // Create table and first round in parallel-friendly way (table must exist first)
+  const playerUids = players.map((p) => p.uid).filter(Boolean);
   const tableRef = await addDoc(collection(db, 'events', eventId, 'tables'), {
     eventId,
     players,
+    playerUids,
     createdAt: serverTimestamp(),
   });
   const roundRef = await addDoc(
