@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   // New event form state
   const [eventType, setEventType] = useState('open_play');
@@ -69,10 +70,13 @@ export default function Dashboard() {
     e.preventDefault();
     if (!eventDate || !eventTime || !eventName.trim()) return;
     setCreating(true);
+    setCreateError('');
     try {
       const { id } = await createEvent(user.uid, eventName.trim(), eventType, eventDate, eventTime);
       navigate(`/event/${id}`);
-    } finally {
+    } catch (err) {
+      console.error('createEvent error:', err);
+      setCreateError(err.message || 'Failed to create event.');
       setCreating(false);
     }
   }
@@ -145,6 +149,7 @@ export default function Dashboard() {
               />
             </label>
 
+            {createError && <p className="error">{createError}</p>}
             <button type="submit" className="btn-primary" disabled={creating || !formReady}>
               {creating ? 'Creating…' : 'Create event'}
             </button>
