@@ -153,6 +153,14 @@ export async function createRound(eventId, tableId) {
   return ref.id;
 }
 
+export async function deleteRound(eventId, tableId, roundId) {
+  const gamesSnap = await getDocs(
+    collection(db, 'events', eventId, 'tables', tableId, 'rounds', roundId, 'games')
+  );
+  await Promise.all(gamesSnap.docs.map((g) => deleteDoc(g.ref)));
+  await deleteDoc(doc(db, 'events', eventId, 'tables', tableId, 'rounds', roundId));
+}
+
 export async function completeRound(eventId, tableId, roundId) {
   await updateDoc(
     doc(db, 'events', eventId, 'tables', tableId, 'rounds', roundId),

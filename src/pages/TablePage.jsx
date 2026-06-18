@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEvent, getTable, getRounds, getGames, completeRound, createRound, deleteTable } from '../lib/firestore';
+import { getEvent, getTable, getRounds, getGames, completeRound, createRound, deleteTable, deleteRound } from '../lib/firestore';
 import { useEdit } from '../context/EditContext';
 
 export default function TablePage() {
@@ -119,6 +119,18 @@ export default function TablePage() {
                   >
                     Complete round
                   </button>
+                  {games.length === 0 && rounds.length > 1 && (
+                    <button
+                      className="btn-danger btn-sm"
+                      onClick={async () => {
+                        if (!window.confirm('Delete this empty round?')) return;
+                        await deleteRound(eventId, tableId, round.id);
+                        load();
+                      }}
+                    >
+                      Delete round
+                    </button>
+                  )}
                 </div>
               )}
             </section>
