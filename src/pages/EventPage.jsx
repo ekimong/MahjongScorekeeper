@@ -14,6 +14,7 @@ export default function EventPage() {
   const [tables, setTables] = useState([]);
   const [totals, setTotals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalsLoading, setTotalsLoading] = useState(true);
   const [showSetup, setShowSetup] = useState(false);
 
   const isOrganizer = user && event && event.createdBy === user.uid;
@@ -35,8 +36,14 @@ export default function EventPage() {
     }
     setEvent(evt);
     setTables(tbls);
+    setLoading(false); // show the page immediately
 
-    // Aggregate scores across all tables → rounds → games, keyed by player name
+    // Load totals in the background
+    loadTotals(tbls);
+  }
+
+  async function loadTotals(tbls) {
+    setTotalsLoading(true);
     const scoreMap = {};
     await Promise.all(
       tbls.map(async (table) => {
@@ -47,7 +54,7 @@ export default function EventPage() {
             games.forEach((game) => {
               if (!game.scores) return;
               table.players?.forEach((player, i) => {
-                if (!player.name?.trim()) return; // skip ghost players
+                if (!player.name?.trim()) return;
                 const key = player.name.trim().toLowerCase();
                 if (!scoreMap[key]) scoreMap[key] = { name: player.name, points: 0, wins: 0, games: 0 };
                 scoreMap[key].points += game.scores[i] || 0;
@@ -59,10 +66,9 @@ export default function EventPage() {
         );
       })
     );
-
     const sorted = Object.values(scoreMap).sort((a, b) => b.points - a.points);
     setTotals(sorted);
-    setLoading(false);
+    setTotalsLoading(false);
   }
 
   async function handleTableCreated(players) {
@@ -129,10 +135,11 @@ export default function EventPage() {
           </section>
         )}
 
-        {totals.length > 0 && (
+        {(totalsLoading || totals.length > 0) && (
           <section className="card">
             <h2>Total scores</h2>
-            <table className="score-table">
+            {totalsLoading && <p className="muted">Loading scores…</p>}
+            {!totalsLoading && <table className="score-table">
               <thead>
                 <tr>
                   <th>Player</th>
@@ -153,7 +160,7 @@ export default function EventPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table>}
           </section>
         )}
       </main>
