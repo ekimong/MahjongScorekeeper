@@ -69,12 +69,12 @@ export async function getUserEvents(uid) {
 }
 
 export async function getEventsAsPlayer(uid) {
+  const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
   try {
-    console.log('[getEventsAsPlayer] starting...');
     const q = query(collectionGroup(db, 'tables'), where('playerUids', 'array-contains', uid));
-    const snap = await getDocs(q);
-    console.log('[getEventsAsPlayer] done, tables found:', snap.size);
-    const eventIds = [...new Set(snap.docs.map((d) => d.data().eventId).filter(Boolean))];
+    const result = await Promise.race([getDocs(q), timeout]);
+    if (!result) return []; // timed out
+    const eventIds = [...new Set(result.docs.map((d) => d.data().eventId).filter(Boolean))];
     if (eventIds.length === 0) return [];
     const events = await Promise.all(eventIds.map((id) => getEvent(id)));
     return events.filter(Boolean);

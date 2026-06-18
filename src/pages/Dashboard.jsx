@@ -36,19 +36,21 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   useEffect(() => {
-    console.log('[Dashboard] loading events for uid:', user.uid);
-    Promise.all([getUserEvents(user.uid), getEventsAsPlayer(user.uid)])
-      .then(([created, playing]) => {
-        console.log('[Dashboard] created:', created.length, 'playing:', playing.length);
-        const seen = new Set();
-        const merged = [...created, ...playing].filter((e) => {
-          if (seen.has(e.id)) return false;
-          seen.add(e.id);
-          return true;
-        });
-        merged.sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
-        setEvents(merged);
+    // Load created events first so the page isn't blocked by the player query
+    getUserEvents(user.uid)
+      .then((created) => {
+        setEvents(created);
         setLoading(false);
+        // Then merge in events where user is a player (best-effort)
+        return getEventsAsPlayer(user.uid);
+      })
+      .then((playing) => {
+        setEvents((prev) => {
+          const seen = new Set(prev.map((e) => e.id));
+          const extra = playing.filter((e) => !seen.has(e.id));
+          if (extra.length === 0) return prev;
+          return [...prev, ...extra].sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
+        });
       })
       .catch((err) => {
         console.error('load events error:', err);
