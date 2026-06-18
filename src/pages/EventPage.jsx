@@ -18,8 +18,7 @@ export default function EventPage() {
   const [showSetup, setShowSetup] = useState(false);
 
   const isOrganizer = user && event && event.createdBy === user.uid;
-  const isPlayer = tables.some((t) => t.players?.some((p) => p.uid === user?.uid));
-  const canScore = isOrganizer || isPlayer || canEdit(eventId);
+  const canScore = !!user || canEdit(eventId);
 
   const shareUrl = event ? `${window.location.origin}/join/${event.shareToken}` : '';
   const editUrl = event?.editToken ? `${window.location.origin}/edit/${event.editToken}` : '';

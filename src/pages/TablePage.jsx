@@ -16,9 +16,7 @@ export default function TablePage() {
   const [gamesByRound, setGamesByRound] = useState({});
   const [loading, setLoading] = useState(true);
 
-  const isOrganizer = user && event && event.createdBy === user.uid;
-  const isPlayer = table?.players?.some((p) => p.uid === user?.uid);
-  const canScore = isOrganizer || isPlayer || canEdit(eventId);
+  const canScore = !!user || canEdit(eventId);
 
   useEffect(() => {
     load();
@@ -126,6 +124,13 @@ export default function TablePage() {
             </section>
           );
         })}
+
+        {canScore && rounds.length === 0 && (
+          <section className="card">
+            <p className="muted">No rounds yet.</p>
+            <button className="btn-primary mt" onClick={handleNewRound}>+ Start round</button>
+          </section>
+        )}
 
         {canScore && allComplete && (
           <button className="btn-secondary" onClick={handleNewRound}>
