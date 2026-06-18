@@ -58,8 +58,8 @@ export default function TablePage() {
   }
 
   async function handleNewRound() {
-    const roundId = await createRound(eventId, tableId);
-    navigate(`/event/${eventId}/table/${tableId}/round/${roundId}/score`);
+    await createRound(eventId, tableId);
+    load();
   }
 
   if (loading) return <div className="loading">Loading…</div>;
