@@ -27,7 +27,6 @@ export async function createEvent(uid, name, type = 'open_play', date = null, ti
     editToken,
     createdAt: serverTimestamp(),
   });
-  await updateDoc(ref, { eventId: ref.id });
   return { id: ref.id, shareToken, editToken };
 }
 
@@ -71,13 +70,12 @@ export async function getUserEvents(uid) {
 // ── Tables ───────────────────────────────────────────────────────────
 
 export async function createTable(eventId, players) {
+  // Create table and first round in parallel-friendly way (table must exist first)
   const tableRef = await addDoc(collection(db, 'events', eventId, 'tables'), {
     eventId,
     players,
     createdAt: serverTimestamp(),
   });
-  await updateDoc(tableRef, { tableId: tableRef.id });
-  // Auto-create first round
   const roundRef = await addDoc(
     collection(db, 'events', eventId, 'tables', tableRef.id, 'rounds'),
     {
@@ -88,7 +86,6 @@ export async function createTable(eventId, players) {
       completedAt: null,
     }
   );
-  await updateDoc(roundRef, { roundId: roundRef.id });
   return { tableId: tableRef.id, roundId: roundRef.id };
 }
 
@@ -133,7 +130,6 @@ export async function createRound(eventId, tableId) {
       completedAt: null,
     }
   );
-  await updateDoc(ref, { roundId: ref.id });
   return ref.id;
 }
 
@@ -167,7 +163,6 @@ export async function saveGame(eventId, tableId, roundId, gameData) {
       completedAt: serverTimestamp(),
     }
   );
-  await updateDoc(ref, { gameId: ref.id });
   return ref.id;
 }
 

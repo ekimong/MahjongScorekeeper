@@ -29,27 +29,29 @@ export default function EventPage() {
   }, [eventId]);
 
   async function load() {
-    let [evt, tbls] = await Promise.all([getEvent(eventId), getTables(eventId)]);
+    // Kick off all three fetches simultaneously
+    const [evtResult, tbls, allGames] = await Promise.all([
+      getEvent(eventId),
+      getTables(eventId),
+      getEventGames(eventId),
+    ]);
+
+    let evt = evtResult;
     if (evt && !evt.editToken) {
       const token = await ensureEditToken(eventId);
       evt = { ...evt, editToken: token };
     }
     setEvent(evt);
     setTables(tbls);
-    setLoading(false); // show the page immediately
+    setLoading(false);
 
-    // Load totals in the background
-    loadTotals(tbls);
+    // Compute totals from already-fetched games — no extra round trips
+    computeTotals(tbls, allGames);
   }
 
-  async function loadTotals(tbls) {
-    setTotalsLoading(true);
-    // Build a tableId → players lookup so we can map scores to names
+  function computeTotals(tbls, allGames) {
     const playersByTable = {};
     tbls.forEach((t) => { playersByTable[t.id] = t.players || []; });
-
-    // Single collection group query — no nested waterfall
-    const allGames = await getEventGames(eventId);
 
     const scoreMap = {};
     allGames.forEach((game) => {
