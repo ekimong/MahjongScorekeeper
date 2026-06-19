@@ -120,6 +120,7 @@ input {
   transition: border-color .15s;
 }
 input:focus { border-color: var(--green-light); }
+input:disabled { background: var(--bg); color: var(--muted); cursor: not-allowed; }
 label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-weight: 500; }
 .inline-form { display: flex; gap: 10px; }
 .inline-form input { flex: 1; }
@@ -236,5 +237,5 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-w
 .loading { padding: 48px; text-align: center; color: var(--muted); }
 .muted { color: var(--muted); font-size: 13px; }
 .small { font-size: 12px; }
-.user-name { font-size: 13px; color: var(--muted); text-decoration: none; }
-.user-name:hover { color: var(--green); text-decoration: underline; }
+.user-name { font-size: 13px; color: var(--green); text-decoration: underline; font-weight: 500; }
+.user-name:hover { color: var(--green-light); }
