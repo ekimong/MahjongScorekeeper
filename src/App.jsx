@@ -11,6 +11,7 @@ import ScoringWizard from './pages/ScoringWizard';
 import GuestView from './pages/GuestView';
 import EditEntry from './pages/EditEntry';
 import History from './pages/History';
+import Profile from './pages/Profile';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
               element={<ProtectedRoute allowGuest><ScoringWizard /></ProtectedRoute>}
             />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </EditProvider>

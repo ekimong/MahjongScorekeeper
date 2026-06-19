@@ -124,6 +124,7 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-w
 .inline-form { display: flex; gap: 10px; }
 .inline-form input { flex: 1; }
 .error { color: var(--red); font-size: 13px; margin-bottom: 8px; }
+.success { color: var(--green); font-size: 13px; margin-bottom: 8px; }
 
 /* ── Event creation form ─────────────────────────────────── */
 .event-form { display: flex; flex-direction: column; gap: 16px; }
@@ -235,4 +236,5 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-w
 .loading { padding: 48px; text-align: center; color: var(--muted); }
 .muted { color: var(--muted); font-size: 13px; }
 .small { font-size: 12px; }
-.user-name { font-size: 13px; color: var(--muted); }
+.user-name { font-size: 13px; color: var(--muted); text-decoration: none; }
+.user-name:hover { color: var(--green); text-decoration: underline; }

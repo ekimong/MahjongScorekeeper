@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserEvents, createEvent } from '../lib/firestore';
 
@@ -83,7 +83,7 @@ export default function Dashboard() {
       <header className="page-header">
         <h1>🀄 Mahjong Scorekeeper</h1>
         <div className="header-right">
-          <span className="user-name">{user.displayName}</span>
+          <Link to="/profile" className="user-name">{user.displayName}</Link>
           <button onClick={logout} className="btn-secondary btn-sm">Sign out</button>
         </div>
       </header>
