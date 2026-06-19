@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEvent, getTables, getEventGames, createTable, ensureEditToken, getRounds, completeRound, createRound } from '../lib/firestore';
+import { getEvent, getTables, getEventGames, createTable, ensureEditToken, getRounds, completeRound, createRound, deleteEvent } from '../lib/firestore';
 import { useEdit } from '../context/EditContext';
 import TableSetupModal from '../components/GameSetupModal';
 
@@ -96,6 +96,16 @@ export default function EventPage() {
     navigate(`/event/${eventId}/table/${tableId}`);
   }
 
+  async function handleDeleteEvent() {
+    if (!window.confirm(`Delete "${event.name}" and all its tables and scores? This cannot be undone.`)) return;
+    try {
+      await deleteEvent(eventId);
+      navigate('/', { replace: true });
+    } catch (err) {
+      alert(`Delete failed: ${err.message}`);
+    }
+  }
+
   async function handleStartNewRoundForDuplicate() {
     const rounds = await getRounds(eventId, duplicateTableId);
     const openRound = rounds.find((r) => r.status === 'open');
@@ -116,11 +126,18 @@ export default function EventPage() {
           <Link to="/" className="back-link">← Events</Link>
           <h1>{event.name}</h1>
         </div>
-        {canScore && (
-          <button className="btn-primary" onClick={() => setShowSetup(true)}>
-            + Add table
-          </button>
-        )}
+        <div className="btn-group">
+          {isOrganizer && (
+            <button className="btn-danger btn-sm" onClick={handleDeleteEvent}>
+              Delete event
+            </button>
+          )}
+          {canScore && (
+            <button className="btn-primary" onClick={() => setShowSetup(true)}>
+              + Add table
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="page-main">

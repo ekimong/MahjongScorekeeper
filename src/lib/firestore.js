@@ -109,6 +109,12 @@ export async function createTable(eventId, players) {
   return { tableId: tableRef.id, roundId: roundRef.id };
 }
 
+export async function deleteEvent(eventId) {
+  const tables = await getTables(eventId);
+  await Promise.all(tables.map((t) => deleteTable(eventId, t.id)));
+  await deleteDoc(doc(db, 'events', eventId));
+}
+
 export async function getTables(eventId) {
   const q = query(
     collection(db, 'events', eventId, 'tables'),
