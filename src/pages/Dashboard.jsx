@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate, NavLink } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserEvents, createEvent, deleteEvent } from '../lib/firestore';
 
@@ -27,6 +27,14 @@ export default function Dashboard() {
   const [loadError, setLoadError] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
+  const [openMenuId, setOpenMenuId] = useState(null);
+
+  useEffect(() => {
+    if (!openMenuId) return;
+    function handleClick() { setOpenMenuId(null); }
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [openMenuId]);
 
   // New event form state
   const [eventType, setEventType] = useState('open_play');
@@ -171,17 +179,30 @@ export default function Dashboard() {
                         : ''}
                     </span>
                   </Link>
-                  <button
-                    className="btn-danger btn-sm"
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      if (!window.confirm(`Delete "${evt.name}"? This will remove all tables and scores and cannot be undone.`)) return;
-                      await deleteEvent(evt.id);
-                      setEvents((prev) => prev.filter((x) => x.id !== evt.id));
-                    }}
-                  >
-                    Delete
-                  </button>
+                  <div className="event-menu-wrap">
+                    <button
+                      className="event-menu-btn"
+                      onClick={(e) => { e.preventDefault(); setOpenMenuId(openMenuId === evt.id ? null : evt.id); }}
+                      aria-label="Event options"
+                    >
+                      ⋯
+                    </button>
+                    {openMenuId === evt.id && (
+                      <div className="event-menu-dropdown">
+                        <button
+                          className="event-menu-item danger"
+                          onClick={async () => {
+                            setOpenMenuId(null);
+                            if (!window.confirm(`Delete "${evt.name}"? This will remove all tables and scores and cannot be undone.`)) return;
+                            await deleteEvent(evt.id);
+                            setEvents((prev) => prev.filter((x) => x.id !== evt.id));
+                          }}
+                        >
+                          Delete event
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
