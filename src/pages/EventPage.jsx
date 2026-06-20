@@ -126,18 +126,11 @@ export default function EventPage() {
           <Link to="/" className="back-link">← Events</Link>
           <h1>{event.name}</h1>
         </div>
-        <div className="btn-group">
-          {isOrganizer && (
-            <button className="btn-danger btn-sm" onClick={handleDeleteEvent}>
-              Delete event
-            </button>
-          )}
-          {canScore && (
-            <button className="btn-primary" onClick={() => setShowSetup(true)}>
-              + Add table
-            </button>
-          )}
-        </div>
+        {canScore && (
+          <button className="btn-primary" onClick={() => setShowSetup(true)}>
+            + Add table
+          </button>
+        )}
       </header>
 
       <main className="page-main">

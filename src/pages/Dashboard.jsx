@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUserEvents, createEvent } from '../lib/firestore';
+import { getUserEvents, createEvent, deleteEvent } from '../lib/firestore';
 
 const EVENT_TYPES = [
   { value: 'open_play', label: 'Open Play', enabled: true },
@@ -162,7 +162,7 @@ export default function Dashboard() {
           ) : (
             <ul className="event-list">
               {events.map((evt) => (
-                <li key={evt.id}>
+                <li key={evt.id} className="event-list-item">
                   <Link to={`/event/${evt.id}`} className="event-link">
                     <span className="event-name">{evt.name}</span>
                     <span className="event-date">
@@ -171,6 +171,17 @@ export default function Dashboard() {
                         : ''}
                     </span>
                   </Link>
+                  <button
+                    className="btn-danger btn-sm"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      if (!window.confirm(`Delete "${evt.name}"? This will remove all tables and scores and cannot be undone.`)) return;
+                      await deleteEvent(evt.id);
+                      setEvents((prev) => prev.filter((x) => x.id !== evt.id));
+                    }}
+                  >
+                    Delete
+                  </button>
                 </li>
               ))}
             </ul>

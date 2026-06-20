@@ -140,7 +140,10 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-w
 
 /* ── Event list ──────────────────────────────────────────── */
 .event-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
-.event-link { display: flex; justify-content: space-between; padding: 10px 8px; border-radius: 7px; text-decoration: none; color: var(--text); transition: background .12s; }
+.event-list-item { display: flex; align-items: center; gap: 8px; }
+.event-list-item .btn-danger { flex-shrink: 0; opacity: 0; transition: opacity .15s; }
+.event-list-item:hover .btn-danger { opacity: 1; }
+.event-link { flex: 1; display: flex; justify-content: space-between; padding: 10px 8px; border-radius: 7px; text-decoration: none; color: var(--text); transition: background .12s; }
 .event-link:hover { background: var(--green-bg); }
 .event-name { font-weight: 500; }
 .event-date { color: var(--muted); font-size: 13px; }
