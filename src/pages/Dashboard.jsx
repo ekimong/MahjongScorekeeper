@@ -28,6 +28,7 @@ export default function Dashboard() {
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   // New event form state
   const [eventType, setEventType] = useState('open_play');
@@ -163,6 +164,7 @@ export default function Dashboard() {
           ) : events.length === 0 ? (
             <p className="muted">No events yet. Create one above.</p>
           ) : (
+            <>
             {openMenuId && <div className="menu-backdrop" onClick={() => setOpenMenuId(null)} />}
             <ul className="event-list">
               {events.map((evt) => (
@@ -175,6 +177,7 @@ export default function Dashboard() {
                         : ''}
                     </span>
                   </Link>
+                  {evt.createdBy === user.uid && (
                   <div className="event-menu-wrap">
                     <button
                       className="event-menu-btn"
@@ -185,23 +188,32 @@ export default function Dashboard() {
                     </button>
                     {openMenuId === evt.id && (
                       <div className="event-menu-dropdown">
-                        <button
-                          className="event-menu-item danger"
-                          onClick={async () => {
-                            setOpenMenuId(null);
-                            if (!window.confirm(`Delete "${evt.name}"? This will remove all tables and scores and cannot be undone.`)) return;
-                            await deleteEvent(evt.id);
-                            loadEvents();
-                          }}
-                        >
-                          Delete event
-                        </button>
+                        {confirmDeleteId === evt.id ? (
+                          <div className="event-menu-confirm">
+                            <p>Delete this event and all its data?</p>
+                            <div className="event-menu-confirm-btns">
+                              <button className="btn-secondary btn-sm" onClick={() => { setConfirmDeleteId(null); setOpenMenuId(null); }}>Cancel</button>
+                              <button className="btn-danger btn-sm" onClick={async () => {
+                                setConfirmDeleteId(null);
+                                setOpenMenuId(null);
+                                await deleteEvent(evt.id);
+                                loadEvents();
+                              }}>Delete</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button className="event-menu-item danger" onClick={() => setConfirmDeleteId(evt.id)}>
+                            Delete event
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
+                  )}
                 </li>
               ))}
             </ul>
+            </>
           )}
         </section>
 

@@ -152,6 +152,9 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-w
 .event-menu-item:hover { background: var(--bg); }
 .event-menu-item.danger { color: var(--red); }
 .event-menu-item.danger:hover { background: #fef2f2; }
+.event-menu-confirm { padding: 12px 14px; }
+.event-menu-confirm p { margin: 0 0 10px; font-size: 13px; color: var(--text); }
+.event-menu-confirm-btns { display: flex; gap: 8px; justify-content: flex-end; }
 .event-name { font-weight: 500; }
 .event-date { color: var(--muted); font-size: 13px; }
 
