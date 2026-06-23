@@ -29,13 +29,6 @@ export default function Dashboard() {
   const [createError, setCreateError] = useState('');
   const [openMenuId, setOpenMenuId] = useState(null);
 
-  useEffect(() => {
-    if (!openMenuId) return;
-    function handleClick() { setOpenMenuId(null); }
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, [openMenuId]);
-
   // New event form state
   const [eventType, setEventType] = useState('open_play');
   const [eventDate, setEventDate] = useState('');
@@ -43,11 +36,13 @@ export default function Dashboard() {
   const [eventName, setEventName] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
 
-  useEffect(() => {
+  function loadEvents() {
     getUserEvents()
       .then((evts) => { setEvents(evts); setLoading(false); })
       .catch((err) => { setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
-  }, [user.uid]);
+  }
+
+  useEffect(() => { loadEvents(); }, [user.uid]);
 
   // Auto-update name whenever type/date/time change, unless user has manually edited it
   useEffect(() => {
@@ -168,6 +163,7 @@ export default function Dashboard() {
           ) : events.length === 0 ? (
             <p className="muted">No events yet. Create one above.</p>
           ) : (
+            {openMenuId && <div className="menu-backdrop" onClick={() => setOpenMenuId(null)} />}
             <ul className="event-list">
               {events.map((evt) => (
                 <li key={evt.id} className="event-list-item">
@@ -182,7 +178,7 @@ export default function Dashboard() {
                   <div className="event-menu-wrap">
                     <button
                       className="event-menu-btn"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenMenuId(openMenuId === evt.id ? null : evt.id); }}
+                      onClick={(e) => { e.preventDefault(); setOpenMenuId(openMenuId === evt.id ? null : evt.id); }}
                       aria-label="Event options"
                     >
                       ⋯
@@ -195,7 +191,7 @@ export default function Dashboard() {
                             setOpenMenuId(null);
                             if (!window.confirm(`Delete "${evt.name}"? This will remove all tables and scores and cannot be undone.`)) return;
                             await deleteEvent(evt.id);
-                            setEvents((prev) => prev.filter((x) => x.id !== evt.id));
+                            loadEvents();
                           }}
                         >
                           Delete event

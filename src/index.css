@@ -143,6 +143,7 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-w
 .event-list-item { display: flex; align-items: center; gap: 4px; }
 .event-link { flex: 1; display: flex; justify-content: space-between; padding: 10px 8px; border-radius: 7px; text-decoration: none; color: var(--text); transition: background .12s; }
 .event-link:hover { background: var(--green-bg); }
+.menu-backdrop { position: fixed; inset: 0; z-index: 99; }
 .event-menu-wrap { position: relative; flex-shrink: 0; }
 .event-menu-btn { background: none; border: none; font-size: 18px; color: var(--muted); cursor: pointer; padding: 6px 10px; border-radius: 6px; line-height: 1; }
 .event-menu-btn:hover { background: var(--border); color: var(--text); }
