@@ -182,7 +182,7 @@ export default function Dashboard() {
                   <div className="event-menu-wrap">
                     <button
                       className="event-menu-btn"
-                      onClick={(e) => { e.preventDefault(); setOpenMenuId(openMenuId === evt.id ? null : evt.id); }}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpenMenuId(openMenuId === evt.id ? null : evt.id); }}
                       aria-label="Event options"
                     >
                       ⋯
