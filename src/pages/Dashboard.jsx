@@ -177,7 +177,7 @@ export default function Dashboard() {
                         : ''}
                     </span>
                   </Link>
-                  {evt.createdBy === user.uid && (
+                  {(!evt.createdBy || evt.createdBy === user.uid) && (
                   <div className="event-menu-wrap">
                     <button
                       className="event-menu-btn"
