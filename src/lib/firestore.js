@@ -112,6 +112,19 @@ export async function createTable(eventId, players) {
 export async function deleteEvent(eventId) {
   const tables = await getTables(eventId);
   await Promise.all(tables.map((t) => deleteTable(eventId, t.id)));
+
+  // Clean up playerMemberships for this event
+  const membershipsSnap = await getDocs(
+    query(collection(db, 'playerMemberships'), where('eventId', '==', eventId))
+  );
+  await Promise.all(membershipsSnap.docs.map((d) => deleteDoc(d.ref)));
+
+  // Clean up history records for this event
+  const historySnap = await getDocs(
+    query(collection(db, 'history'), where('eventId', '==', eventId))
+  );
+  await Promise.all(historySnap.docs.map((d) => deleteDoc(d.ref)));
+
   await deleteDoc(doc(db, 'events', eventId));
 }
 
