@@ -31,6 +31,15 @@ export async function createEvent(uid, name, type = 'open_play', date = null, ti
   return { id: ref.id, shareToken, editToken };
 }
 
+export async function getUserDisplayName(uid) {
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.exists() ? snap.data().displayName || null : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getEvent(eventId) {
   const snap = await getDoc(doc(db, 'events', eventId));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;

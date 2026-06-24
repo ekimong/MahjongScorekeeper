@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEvent, getTables, getEventGames, createTable, ensureEditToken, getRounds, completeRound, createRound, deleteEvent } from '../lib/firestore';
+import { getEvent, getTables, getEventGames, createTable, ensureEditToken, getRounds, completeRound, createRound, deleteEvent, getUserDisplayName } from '../lib/firestore';
 import { useEdit } from '../context/EditContext';
 import TableSetupModal from '../components/GameSetupModal';
 
@@ -17,6 +17,7 @@ export default function EventPage() {
   const [totalsLoading, setTotalsLoading] = useState(true);
   const [showSetup, setShowSetup] = useState(false);
   const [duplicateTableId, setDuplicateTableId] = useState(null);
+  const [creatorName, setCreatorName] = useState('');
 
   const isOrganizer = user && event && event.createdBy === user.uid;
   const canScore = !!user || canEdit(eventId);
@@ -43,6 +44,11 @@ export default function EventPage() {
       setEvent(evt);
       setTables(tbls);
       setLoading(false);
+
+      if (evt && evt.createdBy && evt.createdBy !== user?.uid) {
+        const name = evt.createdByName || await getUserDisplayName(evt.createdBy);
+        setCreatorName(name || '');
+      }
 
       // Fetch games separately so a missing index doesn't block the page
       try {
@@ -128,7 +134,7 @@ export default function EventPage() {
           <p className="event-page-creator">
             {event.createdBy === user?.uid
               ? 'Created by you'
-              : `Created by ${event.createdByName || 'someone else'}`}
+              : `Created by ${creatorName || '…'}`}
           </p>
         </div>
         {canScore && (
