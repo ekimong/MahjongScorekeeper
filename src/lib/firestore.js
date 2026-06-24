@@ -17,12 +17,13 @@ import { nanoid } from 'nanoid';
 
 // ── Events ───────────────────────────────────────────────────────────
 
-export async function createEvent(uid, name, type = 'open_play', date = null, time = null) {
+export async function createEvent(uid, name, type = 'open_play', date = null, time = null, createdByName = '') {
   const shareToken = nanoid(10);
   const editToken = nanoid(10);
   const ref = await addDoc(collection(db, 'events'), {
     name, type, date, time,
     createdBy: uid,
+    createdByName,
     shareToken,
     editToken,
     createdAt: serverTimestamp(),

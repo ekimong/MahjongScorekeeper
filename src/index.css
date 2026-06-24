@@ -156,7 +156,9 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-w
 .event-menu-confirm p { margin: 0 0 10px; font-size: 13px; color: var(--text); }
 .event-menu-confirm-btns { display: flex; gap: 8px; justify-content: flex-end; }
 .event-name { font-weight: 500; }
+.event-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .event-date { color: var(--muted); font-size: 13px; }
+.event-creator { color: var(--muted); font-size: 12px; }
 
 /* ── Table list (EventPage) ──────────────────────────────── */
 .table-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }

@@ -71,7 +71,7 @@ export default function Dashboard() {
     setCreating(true);
     setCreateError('');
     try {
-      const { id } = await createEvent(user.uid, eventName.trim(), eventType, eventDate, eventTime);
+      const { id } = await createEvent(user.uid, eventName.trim(), eventType, eventDate, eventTime, user.displayName || user.email || '');
       navigate(`/event/${id}`);
     } catch (err) {
       console.error('createEvent error:', err);
@@ -171,13 +171,20 @@ export default function Dashboard() {
                 <li key={evt.id} className="event-list-item">
                   <Link to={`/event/${evt.id}`} className="event-link">
                     <span className="event-name">{evt.name}</span>
-                    <span className="event-date">
-                      {evt.createdAt?.toDate
-                        ? evt.createdAt.toDate().toLocaleDateString()
-                        : ''}
+                    <span className="event-meta">
+                      <span className="event-date">
+                        {evt.createdAt?.toDate
+                          ? evt.createdAt.toDate().toLocaleDateString()
+                          : ''}
+                      </span>
+                      <span className="event-creator">
+                        {evt.createdBy === user.uid
+                          ? 'Created by you'
+                          : `Created by ${evt.createdByName || 'someone else'}`}
+                      </span>
                     </span>
                   </Link>
-                  {user && (
+                  {evt.createdBy === user.uid && (
                   <div className="event-menu-wrap">
                     <button
                       className="event-menu-btn"
