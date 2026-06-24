@@ -40,7 +40,7 @@ export default function TableSetupModal({ onConfirm, onClose, onStartNewRound, c
               <input
                 value={p.name}
                 onChange={(e) => setName(i, e.target.value)}
-                placeholder={i === 0 ? 'You' : 'Ghost (leave blank)'}
+                placeholder={i === 0 ? 'You' : ''}
               />
             </label>
           ))}
