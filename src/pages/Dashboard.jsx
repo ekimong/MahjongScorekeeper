@@ -31,9 +31,10 @@ export default function Dashboard() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   // New event form state
+  const now = new Date();
   const [eventType, setEventType] = useState('open_play');
-  const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('');
+  const [eventDate, setEventDate] = useState(now.toLocaleDateString('en-CA')); // YYYY-MM-DD
+  const [eventTime, setEventTime] = useState(now.toTimeString().slice(0, 5));  // HH:MM
   const [eventName, setEventName] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
 
