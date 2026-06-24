@@ -125,6 +125,11 @@ export default function EventPage() {
         <div>
           <Link to="/" className="back-link">← Events</Link>
           <h1>{event.name}</h1>
+          <p className="event-page-creator">
+            {event.createdBy === user?.uid
+              ? 'Created by you'
+              : `Created by ${event.createdByName || 'someone else'}`}
+          </p>
         </div>
         {canScore && (
           <button className="btn-primary" onClick={() => setShowSetup(true)}>

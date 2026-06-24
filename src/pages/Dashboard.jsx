@@ -171,17 +171,10 @@ export default function Dashboard() {
                 <li key={evt.id} className="event-list-item">
                   <Link to={`/event/${evt.id}`} className="event-link">
                     <span className="event-name">{evt.name}</span>
-                    <span className="event-meta">
-                      <span className="event-date">
-                        {evt.createdAt?.toDate
-                          ? evt.createdAt.toDate().toLocaleDateString()
-                          : ''}
-                      </span>
-                      <span className="event-creator">
-                        {evt.createdBy === user.uid
-                          ? 'Created by you'
-                          : `Created by ${evt.createdByName || 'someone else'}`}
-                      </span>
+                    <span className="event-date">
+                      {evt.createdAt?.toDate
+                        ? evt.createdAt.toDate().toLocaleDateString()
+                        : ''}
                     </span>
                   </Link>
                   {evt.createdBy === user.uid && (
