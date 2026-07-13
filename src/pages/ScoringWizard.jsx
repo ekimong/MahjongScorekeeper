@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getEvent, getTable, saveGame, recordHistory } from '../lib/firestore';
-import { useEdit } from '../context/EditContext';
 import { calculateScores } from '../lib/scoring';
 
 export default function ScoringWizard() {

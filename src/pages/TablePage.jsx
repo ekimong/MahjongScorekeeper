@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getEvent, getTable, getRounds, getGames, completeRound, createRound, deleteTable, deleteRound } from '../lib/firestore';
-import { useEdit } from '../context/EditContext';
 
 export default function TablePage() {
   const { eventId, tableId } = useParams();
   const { user } = useAuth();
-  const { canEdit } = useEdit();
   const navigate = useNavigate();
 
   const [event, setEvent] = useState(null);
@@ -16,7 +14,7 @@ export default function TablePage() {
   const [gamesByRound, setGamesByRound] = useState({});
   const [loading, setLoading] = useState(true);
 
-  const canScore = !!user || canEdit(eventId);
+  const canScore = !!user;
 
   useEffect(() => {
     load();

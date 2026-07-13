@@ -19,16 +19,14 @@ import { nanoid } from 'nanoid';
 
 export async function createEvent(uid, name, type = 'open_play', date = null, time = null, createdByName = '') {
   const shareToken = nanoid(10);
-  const editToken = nanoid(10);
   const ref = await addDoc(collection(db, 'events'), {
     name, type, date, time,
     createdBy: uid,
     createdByName,
     shareToken,
-    editToken,
     createdAt: serverTimestamp(),
   });
-  return { id: ref.id, shareToken, editToken };
+  return { id: ref.id, shareToken };
 }
 
 export async function getUserDisplayName(uid) {
@@ -53,42 +51,24 @@ export async function getEventByToken(token) {
   return { id: d.id, ...d.data() };
 }
 
-export async function ensureEditToken(eventId) {
-  const token = nanoid(10);
-  await updateDoc(doc(db, 'events', eventId), { editToken: token });
-  return token;
-}
+export async function getUserEvents(uid) {
+  // Events created by this user
+  const createdSnap = await getDocs(
+    query(collection(db, 'events'), where('createdBy', '==', uid))
+  );
+  const created = createdSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-export async function getEventByEditToken(token) {
-  const q = query(collection(db, 'events'), where('editToken', '==', token));
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  const d = snap.docs[0];
-  return { id: d.id, ...d.data() };
-}
+  // Events where user is a player (via playerMemberships)
+  const memberSnap = await getDocs(
+    query(collection(db, 'playerMemberships'), where('uid', '==', uid))
+  );
+  const memberEventIds = [...new Set(memberSnap.docs.map((d) => d.data().eventId).filter(Boolean))];
+  const memberEvents = (await Promise.all(memberEventIds.map((id) => getEvent(id)))).filter(Boolean);
 
-export async function getUserEvents() {
-  const snap = await getDocs(collection(db, 'events'));
-  const events = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  return events.sort((a, b) => {
-    const aMs = a.createdAt?.toMillis?.() ?? 0;
-    const bMs = b.createdAt?.toMillis?.() ?? 0;
-    return bMs - aMs;
-  });
-}
-
-export async function getEventsAsPlayer(uid) {
-  try {
-    const q = query(collection(db, 'playerMemberships'), where('uid', '==', uid));
-    const snap = await getDocs(q);
-    const eventIds = [...new Set(snap.docs.map((d) => d.data().eventId).filter(Boolean))];
-    if (eventIds.length === 0) return [];
-    const events = await Promise.all(eventIds.map((id) => getEvent(id)));
-    return events.filter(Boolean);
-  } catch (err) {
-    console.error('[getEventsAsPlayer] error:', err.message);
-    return [];
-  }
+  // Merge, deduplicate by id, sort newest first
+  const all = [...created, ...memberEvents];
+  const deduped = [...new Map(all.map((e) => [e.id, e])).values()];
+  return deduped.sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
 }
 
 // ── Tables ───────────────────────────────────────────────────────────

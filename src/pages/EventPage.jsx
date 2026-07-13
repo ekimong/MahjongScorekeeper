@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEvent, getTables, getEventGames, createTable, ensureEditToken, getRounds, completeRound, createRound, deleteEvent, getUserDisplayName } from '../lib/firestore';
-import { useEdit } from '../context/EditContext';
+import { getEvent, getTables, getEventGames, createTable, getRounds, completeRound, createRound, getUserDisplayName } from '../lib/firestore';
 import TableSetupModal from '../components/GameSetupModal';
 
 export default function EventPage() {
   const { eventId } = useParams();
   const { user } = useAuth();
-  const { canEdit } = useEdit();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [tables, setTables] = useState([]);
@@ -20,10 +18,9 @@ export default function EventPage() {
   const [creatorName, setCreatorName] = useState('');
 
   const isOrganizer = user && event && event.createdBy === user.uid;
-  const canScore = !!user || canEdit(eventId);
+  const canScore = !!user;
 
   const shareUrl = event ? `${window.location.origin}/join/${event.shareToken}` : '';
-  const editUrl = event?.editToken ? `${window.location.origin}/edit/${event.editToken}` : '';
 
   useEffect(() => {
     load();
@@ -31,16 +28,11 @@ export default function EventPage() {
 
   async function load() {
     try {
-      const [evtResult, tbls] = await Promise.all([
+      const [evt, tbls] = await Promise.all([
         getEvent(eventId),
         getTables(eventId),
       ]);
 
-      let evt = evtResult;
-      if (evt && !evt.editToken) {
-        const token = await ensureEditToken(eventId);
-        evt = { ...evt, editToken: token };
-      }
       setEvent(evt);
       setTables(tbls);
       setLoading(false);
@@ -50,12 +42,11 @@ export default function EventPage() {
         setCreatorName(name || '');
       }
 
-      // Fetch games separately so a missing index doesn't block the page
       try {
         const allGames = await getEventGames(eventId);
         computeTotals(tbls, allGames);
       } catch (err) {
-        console.error('getEventGames error (index may be missing):', err);
+        console.error('getEventGames error:', err);
         setTotalsLoading(false);
       }
     } catch (err) {
@@ -102,16 +93,6 @@ export default function EventPage() {
     navigate(`/event/${eventId}/table/${tableId}`);
   }
 
-  async function handleDeleteEvent() {
-    if (!window.confirm(`Delete "${event.name}" and all its tables and scores? This cannot be undone.`)) return;
-    try {
-      await deleteEvent(eventId);
-      navigate('/', { replace: true });
-    } catch (err) {
-      alert(`Delete failed: ${err.message}`);
-    }
-  }
-
   async function handleStartNewRoundForDuplicate() {
     const rounds = await getRounds(eventId, duplicateTableId);
     const openRound = rounds.find((r) => r.status === 'open');
@@ -151,11 +132,6 @@ export default function EventPage() {
               <span className="link-label">View-only link</span>
               <code className="share-link">{shareUrl}</code>
               <button className="btn-secondary btn-sm" onClick={() => navigator.clipboard.writeText(shareUrl)}>Copy</button>
-            </div>
-            <div className="link-row" style={{ marginTop: 10 }}>
-              <span className="link-label">Edit link</span>
-              <code className="share-link">{editUrl}</code>
-              <button className="btn-secondary btn-sm" onClick={() => navigator.clipboard.writeText(editUrl)}>Copy</button>
             </div>
           </section>
         )}

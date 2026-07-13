@@ -1,14 +1,10 @@
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useEdit } from '../context/EditContext';
 
-export default function ProtectedRoute({ children, allowGuest = false }) {
+export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
-  const { canEdit } = useEdit();
-  const { eventId } = useParams();
 
   if (loading) return <div className="loading">Loading…</div>;
   if (user) return children;
-  if (allowGuest && eventId && canEdit(eventId)) return children;
   return <Navigate to="/login" replace />;
 }

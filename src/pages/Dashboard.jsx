@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserEvents, createEvent, deleteEvent } from '../lib/firestore';
@@ -39,7 +39,7 @@ export default function Dashboard() {
   const [nameTouched, setNameTouched] = useState(false);
 
   function loadEvents() {
-    getUserEvents()
+    getUserEvents(user.uid)
       .then((evts) => { setEvents(evts); setLoading(false); })
       .catch((err) => { setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
   }
@@ -157,7 +157,7 @@ export default function Dashboard() {
         </section>
 
         <section className="card">
-          <h2>Your events</h2>
+          <h2>My events</h2>
           {loading ? (
             <p className="muted">Loading…</p>
           ) : loadError ? (
