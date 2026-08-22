@@ -106,9 +106,12 @@ export async function createTable(eventId, players) {
       await Promise.all(
         playerUids.map((uid) =>
           setDoc(doc(db, 'playerMemberships', `${uid}_${eventId}`), { uid, eventId })
+            .catch((err) => {
+              console.warn('Failed to create playerMembership for', uid, ':', err.message);
+            })
         )
       );
-      console.log('Memberships created');
+      console.log('Memberships creation attempted');
     }
 
     console.log('Creating round document...');
