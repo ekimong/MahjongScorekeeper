@@ -171,6 +171,35 @@ export default function EventPage() {
           </section>
         )}
 
+        {(totalsLoading || totals.length > 0) && (
+          <section className="card">
+            <h2>Total scores</h2>
+            {totalsLoading && <p className="muted">Loading scores…</p>}
+            {!totalsLoading && <table className="score-table">
+              <thead>
+                <tr>
+                  <th>Player</th>
+                  <th className="num">Points</th>
+                  <th className="num">Wins</th>
+                  <th className="num">Games</th>
+                </tr>
+              </thead>
+              <tbody>
+                {totals.map((row, i) => (
+                  <tr key={i} className={i === 0 ? 'leader' : ''}>
+                    <td>{row.name}</td>
+                    <td className={`num ${row.points > 0 ? 'positive' : row.points < 0 ? 'negative' : ''}`}>
+                      {row.points}
+                    </td>
+                    <td className="num">{row.wins}</td>
+                    <td className="num">{row.games}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>}
+          </section>
+        )}
+
         {tables.length === 0 ? (
           <section className="card">
             <p className="muted">No tables yet. {canScore ? 'Add a table to get started.' : ''}</p>
@@ -193,35 +222,6 @@ export default function EventPage() {
                 </li>
               ))}
             </ul>
-          </section>
-        )}
-
-        {(totalsLoading || totals.length > 0) && (
-          <section className="card">
-            <h2>Total scores</h2>
-            {totalsLoading && <p className="muted">Loading scores…</p>}
-            {!totalsLoading && <table className="score-table">
-              <thead>
-                <tr>
-                  <th>Player</th>
-                  <th className="num">Games</th>
-                  <th className="num">Wins</th>
-                  <th className="num">Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {totals.map((row, i) => (
-                  <tr key={i} className={i === 0 ? 'leader' : ''}>
-                    <td>{row.name}</td>
-                    <td className="num">{row.games}</td>
-                    <td className="num">{row.wins}</td>
-                    <td className={`num ${row.points > 0 ? 'positive' : row.points < 0 ? 'negative' : ''}`}>
-                      {row.points}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>}
           </section>
         )}
       </main>

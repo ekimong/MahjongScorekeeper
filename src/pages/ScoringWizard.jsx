@@ -418,13 +418,21 @@ export default function ScoringWizard() {
 }
 
 function WizardStep({ title, children, onBack }) {
+  const handleInputBlur = () => {
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 100);
+  };
+
   return (
     <div className="wizard-step">
       {onBack && (
         <button className="back-link wizard-back" onClick={onBack}>← Back</button>
       )}
       <h2 className="step-title">{title}</h2>
-      {children}
+      <div onBlur={handleInputBlur} style={{ width: '100%' }}>
+        {children}
+      </div>
     </div>
   );
 }

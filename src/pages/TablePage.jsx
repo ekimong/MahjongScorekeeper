@@ -173,6 +173,8 @@ function RoundScoreGrid({ players, games }) {
         <thead>
           <tr>
             <th className="rg-player">Player</th>
+            <th className="rg-total">Points</th>
+            <th className="rg-total">Wins</th>
             {games.map((game, i) => (
               <th key={game.id} className="rg-game">
                 <div>G{i + 1}</div>
@@ -181,14 +183,16 @@ function RoundScoreGrid({ players, games }) {
                   : game.handName && <div className="rg-tag">{game.handName}</div>}
               </th>
             ))}
-            <th className="rg-total">Wins</th>
-            <th className="rg-total">Points</th>
           </tr>
         </thead>
         <tbody>
           {realPlayers.map((p) => (
             <tr key={p.index}>
               <td className="rg-player">{p.name}</td>
+              <td className={`rg-total ${points[p.index] > 0 ? 'positive' : points[p.index] < 0 ? 'negative' : ''}`}>
+                {points[p.index]}
+              </td>
+              <td className="rg-total">{wins[p.index]}</td>
               {games.map((game) => {
                 const score = game.scores?.[p.index];
                 return (
@@ -197,10 +201,6 @@ function RoundScoreGrid({ players, games }) {
                   </td>
                 );
               })}
-              <td className="rg-total">{wins[p.index]}</td>
-              <td className={`rg-total ${points[p.index] > 0 ? 'positive' : points[p.index] < 0 ? 'negative' : ''}`}>
-                {points[p.index]}
-              </td>
             </tr>
           ))}
         </tbody>
