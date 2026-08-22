@@ -44,7 +44,10 @@ export default function Dashboard() {
       .catch((err) => { setLoadError(err.message || 'Failed to load events.'); setLoading(false); });
   }
 
-  useEffect(() => { loadEvents(); }, [user.uid]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    loadEvents();
+  }, [user.uid]);
 
   // Auto-update name whenever type/date/time change, unless user has manually edited it
   useEffect(() => {

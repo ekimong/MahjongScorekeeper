@@ -34,6 +34,7 @@ export default function ScoringWizard() {
   const [discarderId, setDiscarderId] = useState(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     async function load() {
       const [evt, tbl] = await Promise.all([getEvent(eventId), getTable(eventId, tableId)]);
       setEvent(evt);

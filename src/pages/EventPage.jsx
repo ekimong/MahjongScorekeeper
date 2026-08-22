@@ -23,6 +23,7 @@ export default function EventPage() {
   const shareUrl = event ? `${window.location.origin}/join/${event.shareToken}` : '';
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     load();
   }, [eventId]);
 

@@ -17,6 +17,7 @@ export default function TablePage() {
   const canScore = !!user;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     load();
   }, [eventId, tableId]);
 

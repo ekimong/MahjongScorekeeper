@@ -9,6 +9,7 @@ export default function History() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     getUserHistory(user.uid).then((h) => {
       setHistory(h);
       setLoading(false);
