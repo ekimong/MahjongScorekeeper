@@ -20,7 +20,7 @@ export default function Profile() {
     setSaved(false);
     try {
       await updateProfile(auth.currentUser, { displayName: displayName.trim() });
-      await setDoc(doc(db, 'users', user.uid), { displayName: displayName.trim() }, { merge: true });
+      await setDoc(doc(db, 'users', user.uid), { displayName: displayName.trim(), displayNameLower: displayName.trim().toLowerCase() }, { merge: true });
       setSaved(true);
     } catch (err) {
       setError(err.message || 'Failed to save.');

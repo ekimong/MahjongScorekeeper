@@ -16,13 +16,22 @@ export default function TableSetupModal({ onConfirm, onClose, onStartNewRound, c
   const [error, setError] = useState('');
 
   async function handleSubmit(e) {
+    console.log('handleSubmit called');
     e.preventDefault();
-    if (!players.some((p) => p.name.trim())) return;
+    console.log('preventDefault called');
+    if (!players.some((p) => p.name.trim())) {
+      console.log('No players entered, returning');
+      return;
+    }
+    console.log('Players valid, setting saving=true');
     setSaving(true);
     setError('');
     try {
+      console.log('Calling onConfirm with players:', players);
       await onConfirm(players.map((p) => ({ name: p.name.trim(), uid: p.uid || null })));
+      console.log('onConfirm succeeded');
     } catch (err) {
+      console.error('onConfirm threw error:', err);
       setError(err.message || 'Failed to create table.');
       setSaving(false);
     }
@@ -48,12 +57,7 @@ export default function TableSetupModal({ onConfirm, onClose, onStartNewRound, c
             <div>
               <p className="error">{error}</p>
               {onStartNewRound && (
-                <button
-                  type="button"
-                  className="btn-primary mt"
-                  onClick={onStartNewRound}
-                  disabled={saving}
-                >
+                <button type="button" className="btn-primary mt" onClick={onStartNewRound} disabled={saving}>
                   Yes, start a new round
                 </button>
               )}

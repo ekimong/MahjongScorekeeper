@@ -79,18 +79,52 @@ export default function EventPage() {
   }
 
   async function handleTableCreated(players) {
+    console.log('handleTableCreated called with players:', players);
     const newNames = players.map((p) => p.name).filter(Boolean).map((n) => n.toLowerCase()).sort().join(',');
     const duplicate = tables.find((t) => {
       const existing = (t.players || []).map((p) => p.name).filter(Boolean).map((n) => n.toLowerCase()).sort().join(',');
       return existing === newNames;
     });
     if (duplicate) {
+      console.log('Duplicate table found:', duplicate.id);
       setDuplicateTableId(duplicate.id);
       throw new Error('A table with these players already exists. Would you like to start a new round for that table instead?');
     }
-    const { tableId } = await createTable(eventId, players);
-    setShowSetup(false);
-    navigate(`/event/${eventId}/table/${tableId}`);
+    try {
+      console.log('Calling createTable...');
+      const { tableId } = await createTable(eventId, players);
+      console.log('createTable succeeded:', tableId);
+      setShowSetup(false);
+      navigate(`/event/${eventId}/table/${tableId}`);
+    } catch (err) {
+      console.error('createTable threw error:', err.code, err.message);
+      console.log('Starting retry loop to check if table was created anyway...');
+      // On mobile with long polling, Firestore queues writes offline and retries.
+      // Wait and check multiple times if the table was created despite the error,
+      // since the write might succeed on retry.
+      for (let attempt = 0; attempt < 5; attempt++) {
+        console.log('Retry attempt', attempt + 1);
+        await new Promise((resolve) => setTimeout(resolve, 400 + attempt * 300));
+        const freshTables = await getTables(eventId).catch(() => null);
+        if (freshTables) {
+          console.log('Fresh tables fetched:', freshTables.length);
+          setTables(freshTables);
+          const created = freshTables.find((t) => {
+            const names = (t.players || []).map((p) => p.name).filter(Boolean).map((n) => n.toLowerCase()).sort().join(',');
+            return names === newNames;
+          });
+          if (created) {
+            console.log('Table was created on attempt', attempt + 1);
+            setShowSetup(false);
+            navigate(`/event/${eventId}/table/${created.id}`);
+            return;
+          }
+        }
+      }
+      // If we still haven't found it after retries, show the error
+      console.log('After 5 retries, table not found. Re-throwing error.');
+      throw err;
+    }
   }
 
   async function handleStartNewRoundForDuplicate() {

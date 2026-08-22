@@ -197,8 +197,12 @@ export default function Dashboard() {
                               <button className="btn-danger btn-sm" onClick={async () => {
                                 setConfirmDeleteId(null);
                                 setOpenMenuId(null);
-                                await deleteEvent(evt.id);
-                                loadEvents();
+                                try {
+                                  await deleteEvent(user.uid, evt.id);
+                                  loadEvents();
+                                } catch (err) {
+                                  alert(`Delete failed: ${err.message}`);
+                                }
                               }}>Delete</button>
                             </div>
                           </div>

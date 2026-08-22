@@ -29,6 +29,7 @@ export function AuthProvider({ children }) {
     await updateProfile(credential.user, { displayName });
     await setDoc(doc(db, 'users', credential.user.uid), {
       displayName,
+      displayNameLower: displayName.toLowerCase(),
       email,
       createdAt: serverTimestamp(),
     });
@@ -47,6 +48,7 @@ export function AuthProvider({ children }) {
     if (!snap.exists()) {
       await setDoc(ref, {
         displayName: credential.user.displayName,
+        displayNameLower: credential.user.displayName?.toLowerCase() || '',
         email: credential.user.email,
         createdAt: serverTimestamp(),
       });

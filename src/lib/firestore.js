@@ -10,6 +10,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -27,6 +28,21 @@ export async function createEvent(uid, name, type = 'open_play', date = null, ti
     createdAt: serverTimestamp(),
   });
   return { id: ref.id, shareToken };
+}
+
+export async function searchUsers(term) {
+  if (!term || term.length < 2) return [];
+  const t = term.toLowerCase();
+  const end = t + '';
+  const [nameSnap, emailSnap] = await Promise.all([
+    getDocs(query(collection(db, 'users'), where('displayNameLower', '>=', t), where('displayNameLower', '<=', end), limit(8))),
+    getDocs(query(collection(db, 'users'), where('email', '>=', t), where('email', '<=', end), limit(8))),
+  ]);
+  const map = new Map();
+  [...nameSnap.docs, ...emailSnap.docs].forEach((d) => {
+    map.set(d.id, { uid: d.id, ...d.data() });
+  });
+  return [...map.values()].slice(0, 8);
 }
 
 export async function getUserDisplayName(uid) {
@@ -74,46 +90,61 @@ export async function getUserEvents(uid) {
 // ── Tables ───────────────────────────────────────────────────────────
 
 export async function createTable(eventId, players) {
-  const tableRef = await addDoc(collection(db, 'events', eventId, 'tables'), {
-    eventId,
-    players,
-    createdAt: serverTimestamp(),
-  });
-  // Record membership for each player with an account so they can find this event
-  const playerUids = players.map((p) => p.uid).filter(Boolean);
-  await Promise.all(
-    playerUids.map((uid) =>
-      setDoc(doc(db, 'playerMemberships', `${uid}_${eventId}`), { uid, eventId })
-    )
-  );
-  const roundRef = await addDoc(
-    collection(db, 'events', eventId, 'tables', tableRef.id, 'rounds'),
-    {
+  try {
+    console.log('Creating table document...');
+    const tableRef = await addDoc(collection(db, 'events', eventId, 'tables'), {
       eventId,
-      tableId: tableRef.id,
-      status: 'open',
+      players,
       createdAt: serverTimestamp(),
-      completedAt: null,
+    });
+    console.log('Table created:', tableRef.id);
+
+    // Record membership for each player with an account so they can find this event
+    const playerUids = players.map((p) => p.uid).filter(Boolean);
+    if (playerUids.length > 0) {
+      console.log('Creating playerMemberships for UIDs:', playerUids);
+      await Promise.all(
+        playerUids.map((uid) =>
+          setDoc(doc(db, 'playerMemberships', `${uid}_${eventId}`), { uid, eventId })
+        )
+      );
+      console.log('Memberships created');
     }
-  );
-  return { tableId: tableRef.id, roundId: roundRef.id };
+
+    console.log('Creating round document...');
+    const roundRef = await addDoc(
+      collection(db, 'events', eventId, 'tables', tableRef.id, 'rounds'),
+      {
+        eventId,
+        tableId: tableRef.id,
+        status: 'open',
+        createdAt: serverTimestamp(),
+        completedAt: null,
+      }
+    );
+    console.log('Round created:', roundRef.id);
+    return { tableId: tableRef.id, roundId: roundRef.id };
+  } catch (err) {
+    console.error('createTable failed:', err.code, err.message);
+    throw err;
+  }
 }
 
-export async function deleteEvent(eventId) {
+export async function deleteEvent(uid, eventId) {
   const tables = await getTables(eventId);
   await Promise.all(tables.map((t) => deleteTable(eventId, t.id)));
 
-  // Clean up playerMemberships for this event
-  const membershipsSnap = await getDocs(
-    query(collection(db, 'playerMemberships'), where('eventId', '==', eventId))
-  );
-  await Promise.all(membershipsSnap.docs.map((d) => deleteDoc(d.ref)));
+  // Clean up only the current user's own membership + history records — Firestore
+  // rules prevent reading other users' docs, so we target by uid directly.
+  const ownMembershipRef = doc(db, 'playerMemberships', `${uid}_${eventId}`);
+  await deleteDoc(ownMembershipRef).catch(() => {});
 
-  // Clean up history records for this event
   const historySnap = await getDocs(
-    query(collection(db, 'history'), where('eventId', '==', eventId))
-  );
-  await Promise.all(historySnap.docs.map((d) => deleteDoc(d.ref)));
+    query(collection(db, 'history'), where('uid', '==', uid), where('eventId', '==', eventId))
+  ).catch(() => null);
+  if (historySnap) {
+    await Promise.all(historySnap.docs.map((d) => deleteDoc(d.ref)));
+  }
 
   await deleteDoc(doc(db, 'events', eventId));
 }
