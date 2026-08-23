@@ -271,7 +271,32 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-w
 .table-arrow { font-size: 20px; color: var(--muted); }
 
 /* ── Round score grid (TablePage) ────────────────────────── */
-.round-grid-wrap { overflow-x: auto; }
+.round-grid-outer { position: relative; }
+.scroll-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green-light);
+  text-align: right;
+  padding: 0 0 6px;
+  animation: hint-pulse 1.8s ease-in-out infinite;
+}
+
+@media (max-width: 600px) {
+  .scroll-hint {
+    font-size: 14px;
+  }
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+.round-grid-wrap { overflow-x: auto; position: relative; }
+.round-grid-wrap.has-more-right {
+  mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+}
 .round-grid { width: 100%; border-collapse: collapse; font-size: 13px; }
 
 @media (max-width: 600px) {

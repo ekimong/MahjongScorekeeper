@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getEvent, getTable, getRounds, getGames, completeRound, createRound, deleteTable, deleteRound } from '../lib/firestore';
@@ -154,6 +154,24 @@ export default function TablePage() {
 }
 
 function RoundScoreGrid({ players, games }) {
+  const wrapRef = useRef(null);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    function checkScroll() {
+      setCanScrollRight(el.scrollWidth - el.scrollLeft - el.clientWidth > 4);
+    }
+    checkScroll();
+    el.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [games.length]);
+
   if (games.length === 0) {
     return <p className="muted">No games yet.</p>;
   }
@@ -168,7 +186,9 @@ function RoundScoreGrid({ players, games }) {
   });
 
   return (
-    <div className="round-grid-wrap">
+    <div className="round-grid-outer">
+      {canScrollRight && <div className="scroll-hint">Scroll for more games →</div>}
+      <div className={`round-grid-wrap ${canScrollRight ? 'has-more-right' : ''}`} ref={wrapRef}>
       <table className="round-grid">
         <thead>
           <tr>
@@ -205,6 +225,7 @@ function RoundScoreGrid({ players, games }) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
