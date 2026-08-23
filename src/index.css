@@ -88,6 +88,14 @@ body {
   font-size: 13px;
   margin-bottom: 4px;
 }
+
+@media (max-width: 600px) {
+  .back-link {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+}
+
 .back-link:hover { text-decoration: underline; }
 
 /* ── Cards ───────────────────────────────────────────────── */
@@ -225,7 +233,20 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-w
 .event-menu-confirm-btns { display: flex; gap: 8px; justify-content: flex-end; }
 .event-name { font-weight: 500; }
 .event-page-creator { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+
+@media (max-width: 600px) {
+  .event-page-creator {
+    font-size: 15px;
+  }
+}
+
 .event-date { color: var(--muted); font-size: 13px; }
+
+@media (max-width: 600px) {
+  .event-date {
+    font-size: 15px;
+  }
+}
 
 /* ── Table list (EventPage) ──────────────────────────────── */
 .table-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
@@ -233,14 +254,48 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-w
 .table-link:hover { background: var(--green-bg); }
 .table-link-left { display: flex; flex-direction: column; gap: 2px; }
 .table-num { font-weight: 600; font-size: 14px; }
+
+@media (max-width: 600px) {
+  .table-num {
+    font-size: 17px;
+  }
+}
+
 .table-players { font-size: 13px; color: var(--muted); }
+
+@media (max-width: 600px) {
+  .table-players {
+    font-size: 15px;
+  }
+}
 .table-arrow { font-size: 20px; color: var(--muted); }
 
 /* ── Round score grid (TablePage) ────────────────────────── */
 .round-grid-wrap { overflow-x: auto; }
 .round-grid { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+@media (max-width: 600px) {
+  .round-grid {
+    font-size: 16px;
+  }
+}
+
 .round-grid th, .round-grid td { padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+
+@media (max-width: 600px) {
+  .round-grid th, .round-grid td {
+    padding: 10px 12px;
+  }
+}
+
 .round-grid th { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; text-align: center; }
+
+@media (max-width: 600px) {
+  .round-grid th {
+    font-size: 13px;
+  }
+}
+
 .round-grid .rg-player { text-align: left; font-weight: 600; min-width: 90px; }
 .round-grid th.rg-player { text-align: left; }
 .round-grid .rg-game { text-align: center; min-width: 52px; }
@@ -262,8 +317,30 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-w
 
 /* ── Score table ─────────────────────────────────────────── */
 .score-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+@media (max-width: 600px) {
+  .score-table {
+    font-size: 17px;
+  }
+}
+
 .score-table th { text-align: left; color: var(--muted); font-size: 12px; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+
+@media (max-width: 600px) {
+  .score-table th {
+    font-size: 15px;
+    padding: 10px 10px;
+  }
+}
+
 .score-table td { padding: 9px 8px; border-bottom: 1px solid var(--border); }
+
+@media (max-width: 600px) {
+  .score-table td {
+    padding: 12px 10px;
+    font-size: 17px;
+  }
+}
 .score-table tr.leader td { font-weight: 600; }
 .score-table .num { text-align: right; }
 .positive { color: var(--green); }
