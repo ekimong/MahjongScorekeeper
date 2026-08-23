@@ -173,7 +173,7 @@ export default function EventPage() {
 
         {(totalsLoading || totals.length > 0) && (
           <section className="card">
-            <h2>Total scores</h2>
+            <h2 className="section-heading">Total scores</h2>
             {totalsLoading && <p className="muted">Loading scores…</p>}
             {!totalsLoading && <table className="score-table">
               <thead>
@@ -206,7 +206,7 @@ export default function EventPage() {
           </section>
         ) : (
           <section className="card">
-            <h2>Tables</h2>
+            <h2 className="section-heading">Tables</h2>
             <ul className="table-list">
               {tables.map((table, idx) => (
                 <li key={table.id}>
