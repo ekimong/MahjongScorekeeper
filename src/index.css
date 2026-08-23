@@ -108,10 +108,10 @@ body {
 }
 .card h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
 
-.section-heading { font-size: 20px; }
+.card h2.section-heading { font-size: 20px; }
 
 @media (max-width: 600px) {
-  .section-heading {
+  .card h2.section-heading {
     font-size: 22px;
   }
 }
